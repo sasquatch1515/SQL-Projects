@@ -1,4 +1,4 @@
-# SQL-Shenanigans
+# SQL-Projects
 This repository will serve as a staging ground for all my SQL work.
 
 ## Projects

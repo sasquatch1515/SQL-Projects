@@ -1,4 +1,4 @@
--- 
+-- This query is written to pull the top movie genre, total customers, and total money spent by those customers.
 SELECT E.country,
 	COUNT(A.customer_id) AS customer_count, -- Count the number of customers from each country
     SUM(A.amount) AS total_amount_paid, -- Sum the amount of money spent by each country

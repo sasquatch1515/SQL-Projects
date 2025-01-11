@@ -1,25 +1,26 @@
+-- 
 SELECT E.country,
-	COUNT(A.customer_id) AS customer_count, 
-    SUM(A.amount) AS total_amount_paid,
-	(SELECT M.name
+	COUNT(A.customer_id) AS customer_count, -- Count the number of customers from each country
+    SUM(A.amount) AS total_amount_paid, -- Sum the amount of money spent by each country
+	(SELECT M.name --Subquery to find the top genre for each country
 FROM category M
-INNER JOIN film_category N ON M.category_id = N.category_id
-INNER JOIN inventory O ON N.film_id = O.film_id
-INNER JOIN rental P ON O.inventory_id = P.inventory_id
-INNER JOIN payment Q ON P.rental_id = Q.rental_id
-INNER JOIN customer R ON Q.customer_id = R.customer_id
-INNER JOIN address S ON R.address_id = S.address_id
-INNER JOIN city T ON S.city_id = T.city_id
-INNER JOIN country U ON T.country_id = U.country_id
-WHERE U.country = E.country
-GROUP BY M.name
-ORDER BY COUNT(*) DESC
-LIMIT 1) AS top_genre
+INNER JOIN film_category N ON M.category_id = N.category_id -- Joins category to film_category
+INNER JOIN inventory O ON N.film_id = O.film_id -- Joins film_category to inventory
+INNER JOIN rental P ON O.inventory_id = P.inventory_id -- Joins inventory to rental
+INNER JOIN payment Q ON P.rental_id = Q.rental_id -- Joins rental to payment
+INNER JOIN customer R ON Q.customer_id = R.customer_id -- Joins payment to customer
+INNER JOIN address S ON R.address_id = S.address_id -- Joins customer to address
+INNER JOIN city T ON S.city_id = T.city_id -- joins address to city
+INNER JOIN country U ON T.country_id = U.country_id -- joins city to country
+WHERE U.country = E.country -- Correlates the subquery to the outer query using country
+GROUP BY M.name -- Group by category name to count the number of rentals from each category
+ORDER BY COUNT(*) DESC -- Order by rental count in descending order
+LIMIT 1) AS top_genre -- Only select the top category
 FROM payment A
-INNER JOIN customer B ON A.customer_id = B.customer_id
-INNER JOIN address C ON B.address_id = C.address_id
-INNER JOIN city D ON C.city_id = D.city_id
-INNER JOIN country E ON D.country_id = E.country_id
-GROUP BY E.country
-ORDER BY total_amount_paid DESC
-LIMIT 10
+INNER JOIN customer B ON A.customer_id = B.customer_id -- Joins payment to customer
+INNER JOIN address C ON B.address_id = C.address_id -- Joins customer to address
+INNER JOIN city D ON C.city_id = D.city_id -- Joins address to city
+INNER JOIN country E ON D.country_id = E.country_id -- Joins city to country
+GROUP BY E.country -- Calculate aggregates based on country
+ORDER BY total_amount_paid DESC -- Order the results by total amount paid by each country
+LIMIT 10 -- Only pull the top 10 countries in terms of total money spent

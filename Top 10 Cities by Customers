@@ -1,0 +1,19 @@
+-- This query pulls the number of customers from the top 10 cities in the top 10 countries (both top 10s determined by number of customers)
+SELECT D. Country, C.city, COUNT(A.customer_id) AS customer_count
+FROM customer A
+INNER JOIN address B ON A.address_id = B.address_id -- Joins customer to address
+INNER JOIN city C ON B.city_id = C.city_id -- Joins address to city
+INNER JOIN country D ON C.country_id = D.country_id -- Joins city to country
+WHERE D.country IN ( -- Subquery to filter for the top 10 countries by customer count
+    SELECT D.country 
+    FROM customer A
+    INNER JOIN address B ON A.address_id = B.address_id
+    INNER JOIN city C ON B.city_id = C.city_id
+    INNER JOIN country D ON C.country_id = D.country_id
+    GROUP BY country -- Group by country to count customers for the country
+    ORDER BY COUNT(customer_id) DESC -- Order countries by customer count
+    LIMIT 10 -- Select only the top 10 countries
+)
+GROUP BY D.country, C.cit -- Group by country and city to count customers in each city
+ORDER BY customer_count DESC -- This puts countrys with higher customer counts at the top of the list
+LIMIT 10 -- Select and show only top 10 cities

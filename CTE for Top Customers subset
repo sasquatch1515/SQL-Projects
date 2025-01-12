@@ -1,0 +1,33 @@
+-- This query creates a CTE called top_customers so that further queries can be done on just this subset of customers
+WITH top_customers AS -- Creates a CTE for top_customers so I can select only from this subset of customers
+	(SELECT A.customer_id, B.first_name, B.last_name, E.country, D.city, SUM (A.Amount) AS total_amount_paid
+	FROM payment A
+	INNER JOIN customer B ON A.customer_id = B.customer_id -- Joins payment to customer
+	INNER JOIN address C ON B.address_id = C.address_id -- Joins customer to address
+	INNER JOIN city D ON C.city_id = D.city_id -- Joins address to city
+	INNER JOIN country E ON D.country_id = E.country_id -- Joins city to country
+	WHERE (E.country, D.city) IN (SELECT D. country, C.city
+	FROM customer A
+	INNER JOIN address B ON A.address_id = B.address_id
+	INNER JOIN city C ON B.city_id = C.city_id
+	INNER JOIN country D ON C.country_id = D.country_id
+	WHERE D.country IN ( -- Subquery to determine the top 10 countries with the most customers
+    	SELECT D.country 
+    	FROM customer A
+    	INNER JOIN address B ON A.address_id = B.address_id
+    	INNER JOIN city C ON B.city_id = C.city_id
+    	INNER JOIN country D ON C.country_id = D.country_id
+    	GROUP BY country
+    	ORDER BY COUNT(customer_id) DESC
+    	LIMIT 10
+		)
+	GROUP BY D.country, C.city
+	ORDER BY COUNT(A.customer_id) DESC
+	LIMIT 10
+	)
+GROUP BY A.customer_id, B.first_name, B.last_name, E.country, D.city
+ORDER BY total_amount_paid desc
+LIMIT 5)
+
+SELECT AVG(total_amount_paid) AS average_amount_paid
+FROM top_customers;

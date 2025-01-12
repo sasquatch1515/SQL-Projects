@@ -1,0 +1,9 @@
+-- This creates a new table in a database called Employees 3, with columns named employee_id, name, contact_number, designation_id, and last_update. It also sets the primary key for the table as employee_id.
+CREATE TABLE EMPLOYEES3 ( -- Create new table called Employees 3
+employee_id INTEGER NOT NULL, -- unique identifier for each employee, cannot be a null value
+name VARCHAR(50), -- Employee's name, up to 50 characters
+contact_number VARCHAR(30), -- Employee's contact number, up to 30 characters
+designation_id integer, -- Employee's job designation code as an integer
+last_update timestamp without time zone NOT NULL DEFAULT now(), -- timestamp of the latest update, cannot be null, default is current timestamp
+CONSTRAINT employee_pkey PRIMARY KEY (employee_id) -- Defines employee_id as the primary key
+);
